@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { label: 'Products',     targetId: 'products' },
   { label: 'How It Works', targetId: 'how'      },
   { label: 'Why Us',       targetId: 'features' },
+  { label: 'Contact Us',   targetId: 'contact'  },
 ]
 
 export default function Navbar() {
@@ -62,11 +63,11 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group no-underline" aria-label="Kannan Farms Home">
-            <div className="h-11 w-11 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center flex-shrink-0">
+            <div className="h-14 w-14 overflow-hidden flex items-center justify-center flex-shrink-0">
               <img
                 src="assets/Logowoback.png"
                 alt="Kannan Farms"
-                className="h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-110"
+                className="h-13 w-13 object-contain transition-transform duration-300 group-hover:scale-110"
                 onError={(e) => {
                   e.target.style.display = 'none'
                   e.target.nextSibling.style.display = 'flex'

@@ -265,6 +265,85 @@ export default function Home() {
           </motion.button>
         </Reveal>
       </section>
+
+      {/* ── CONTACT US ── */}
+      <section className="section-pad bg-white border-t border-border-green" id="contact">
+        <div className="max-w-4xl mx-auto px-5">
+          <Reveal>
+            <p className="eyebrow">Get in Touch</p>
+            <h2 className="font-playfair font-black text-section-title text-text-dark text-center mb-3.5">
+              Contact Us
+            </h2>
+            <p className="text-center text-text-muted text-[15px] leading-relaxed max-w-[460px] mx-auto mb-14">
+              Have questions, feedback, or need bulk ordering? We'd love to hear from you.
+            </p>
+          </Reveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-5">
+            {/* Contact Info Cards */}
+            <Reveal className="space-y-4">
+              <div className="flex items-start gap-4 p-5 bg-green-xlight/40 border border-border-green/50 rounded-2xl">
+                <span className="text-2xl mt-0.5">📍</span>
+                <div>
+                  <h4 className="text-[13px] font-bold text-text-dark uppercase tracking-wider mb-1">Our Farm Address</h4>
+                  <p className="text-text-muted text-sm leading-relaxed">
+                    Mavuthampathi, Coimbatore,<br />Tamil Nadu, India
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-5 bg-green-xlight/40 border border-border-green/50 rounded-2xl">
+                <span className="text-2xl mt-0.5">📱</span>
+                <div>
+                  <h4 className="text-[13px] font-bold text-text-dark uppercase tracking-wider mb-1">Contact Number</h4>
+                  <p className="text-text-muted text-sm font-semibold">
+                    <a href="https://wa.me/916381594945" target="_blank" rel="noopener noreferrer" className="text-green-dark hover:text-green-main transition-colors no-underline">
+                      +91 63815 94945 (WhatsApp Support)
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal className="space-y-4" delay={0.1}>
+              <div className="flex items-start gap-4 p-5 bg-green-xlight/40 border border-border-green/50 rounded-2xl">
+                <span className="text-2xl mt-0.5">✉️</span>
+                <div>
+                  <h4 className="text-[13px] font-bold text-text-dark uppercase tracking-wider mb-1">Email Address</h4>
+                  <p className="text-text-muted text-sm font-semibold">
+                    <a href="mailto:kannansfarms@gmail.com" className="text-green-dark hover:text-green-main transition-colors no-underline">
+                      kannansfarms@gmail.com
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-5 bg-green-xlight/40 border border-border-green/50 rounded-2xl">
+                <span className="text-2xl mt-0.5">📸</span>
+                <div>
+                  <h4 className="text-[13px] font-bold text-text-dark uppercase tracking-wider mb-1">Instagram</h4>
+                  <p className="text-text-muted text-sm font-semibold">
+                    <a href="https://instagram.com/kannan.farms" target="_blank" rel="noopener noreferrer" className="text-green-dark hover:text-green-main transition-colors no-underline">
+                      @kannan.farms
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* FSSAI Licensing Strip */}
+          <Reveal delay={0.2} className="mt-12 text-center border-t border-dashed border-border-green/60 pt-8">
+            <div className="inline-flex items-center gap-3 bg-offwhite border border-border-green px-6 py-3.5 rounded-2xl shadow-sm">
+              <span className="text-2xl">📄</span>
+              <div className="text-left">
+                <p className="text-[10px] text-text-muted uppercase tracking-wider font-semibold">Food Safety Standard Authority of India</p>
+                <p className="text-[14px] font-bold text-text-dark mt-0.5">FSSAI Lic. No. 22424011000074</p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
     </>
   )
 }

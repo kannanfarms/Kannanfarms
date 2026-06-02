@@ -98,32 +98,36 @@ export default function Footer() {
             <div className="flex flex-col gap-3 text-[13px] text-white/50">
               <div className="flex items-start gap-2.5">
                 <span className="text-base mt-0.5">📍</span>
-                <span>Tiruppur, Tamil Nadu, India</span>
+                <span>Mavuthampathi, Coimbatore, Tamil Nadu, India</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <span className="text-base">📱</span>
-                <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="hover:text-green-vivid transition-colors">
-                  +91 98765 43210 (WhatsApp Support)
+                <a href="https://wa.me/916381594945" target="_blank" rel="noopener noreferrer" className="hover:text-green-vivid transition-colors">
+                  +91 63815 94945 (WhatsApp Support)
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <span className="text-base">📸</span>
-                <a href="https://instagram.com/kannanfarms" target="_blank" rel="noopener noreferrer" className="hover:text-green-vivid transition-colors">
-                  @kannanfarms (Instagram)
+                <a href="https://instagram.com/kannan.farms" target="_blank" rel="noopener noreferrer" className="hover:text-green-vivid transition-colors">
+                  @kannan.farms (Instagram)
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <span className="text-base">✉️</span>
-                <a href="mailto:info@kannanfarms.in" className="hover:text-green-vivid transition-colors">
-                  info@kannanfarms.in
+                <a href="mailto:kannansfarms@gmail.com" className="hover:text-green-vivid transition-colors">
+                  kannansfarms@gmail.com
                 </a>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <span className="text-base">📄</span>
+                <span>FSSAI Lic. No. 22424011000074</span>
               </div>
             </div>
 
             {/* Social */}
             <div className="flex gap-3 mt-6">
               <a
-                href="https://instagram.com/kannanfarms"
+                href="https://instagram.com/kannan.farms"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"

@@ -45,21 +45,22 @@ export default function ProductCard({ product, index = 0 }) {
       transition={{ duration: 0.7, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
       style={{ perspective: '1000px' }}
     >
-      <motion.article
-        ref={ref}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={handleMouseLeave}
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: 'preserve-3d',
-        }}
-        className="relative w-[340px] max-w-full bg-white border-2 border-border-green rounded-3xl overflow-hidden cursor-pointer select-none"
-        whileHover={{ borderColor: 'rgba(27,138,76,0.8)' }}
-        transition={{ duration: 0.3 }}
-        aria-label={`View ${product.name}`}
-      >
+      <Link to={`/product/${product.slug}`} className="no-underline block">
+        <motion.article
+          ref={ref}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            rotateX,
+            rotateY,
+            transformStyle: 'preserve-3d',
+          }}
+          className="relative w-[340px] max-w-full bg-white border-2 border-border-green rounded-3xl overflow-hidden cursor-pointer select-none"
+          whileHover={{ borderColor: 'rgba(27,138,76,0.8)' }}
+          transition={{ duration: 0.3 }}
+          aria-label={`View ${product.name}`}
+        >
         {/* Glare overlay */}
         <motion.div
           className="absolute inset-0 rounded-3xl pointer-events-none z-30 opacity-0"
@@ -139,16 +140,15 @@ export default function ProductCard({ product, index = 0 }) {
                 {product.sizes?.[0]?.price || '₹ View Price'}
               </div>
             </div>
-            <Link
-              to={`/product/${product.slug}`}
-              className="btn-primary text-[13px] px-5 py-3 no-underline"
-              tabIndex={0}
+            <span
+              className="btn-primary text-[13px] px-5 py-3 no-underline inline-block"
             >
               Buy Now →
-            </Link>
+            </span>
           </div>
         </div>
       </motion.article>
+     </Link>
     </motion.div>
   )
 }
