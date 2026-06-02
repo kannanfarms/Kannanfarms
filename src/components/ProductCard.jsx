@@ -88,7 +88,7 @@ export default function ProductCard({ product, index = 0 }) {
             <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-green-xlight via-green-light to-green-xlight" />
           )}
           <motion.img
-            src={product.heroImage}
+            src={product.heroImage?.startsWith('/') ? product.heroImage.slice(1) : product.heroImage}
             alt={product.name}
             className="w-full h-full object-cover"
             style={{ opacity: imgLoaded ? 1 : 0 }}

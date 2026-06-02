@@ -338,7 +338,7 @@ export default function Cart() {
                           <Link to={`/product/${item.slug}`} className="flex-shrink-0">
                             <div className="w-[72px] h-[72px] rounded-xl bg-green-xlight border border-border-green overflow-hidden flex items-center justify-center">
                               <img
-                                src={`/assets/${item.name.split(' ')[0]} 1.png`}
+                                src={`assets/${item.name.split(' ')[0]} 1.png`}
                                 alt={item.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {

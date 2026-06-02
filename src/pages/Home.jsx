@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import SEOHead from '../components/SEOHead'
 import Hero from '../components/Hero'
@@ -57,6 +58,21 @@ const TRUST = [
 // ── HOME ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const { products, loading } = useProducts()
+  const location = useLocation()
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const scrollTarget = params.get('scroll')
+    if (scrollTarget) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(scrollTarget)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [location])
 
   // Filter out products marked as hidden from consumers
   const visibleProducts = products.filter((p) => !p.hidden)
@@ -236,14 +252,14 @@ export default function Home() {
           <p className="text-[15px] leading-relaxed max-w-[440px] mx-auto mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>
             Join hundreds of happy families across Tamil Nadu who trust Kannan Farms every day.
           </p>
-          <motion.a
-            href="#products"
+          <motion.button
+            onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
             className="inline-block bg-white text-green-dark font-dm font-bold text-[15px] px-10 py-4 rounded-xl transition-all duration-300"
             style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.15)' }}
             whileHover={{ y: -3, boxShadow: '0 12px 30px rgba(0,0,0,0.2)' }}
           >
             Shop Our Products →
-          </motion.a>
+          </motion.button>
         </Reveal>
       </section>
     </>

@@ -105,7 +105,7 @@ function ProductDetailInner({ product, products }) {
                   whileTap={{ scale: 0.96 }}
                 >
                   <img
-                    src={src}
+                    src={src?.startsWith('/') ? src.slice(1) : src}
                     alt={`${product.name} view ${i + 1}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -123,7 +123,7 @@ function ProductDetailInner({ product, products }) {
               <AnimatePresence mode="wait">
                 <motion.img
                   key={activeImg}
-                  src={product.images[activeImg]}
+                  src={product.images[activeImg]?.startsWith('/') ? product.images[activeImg].slice(1) : product.images[activeImg]}
                   alt={`${product.name} — view ${activeImg + 1}`}
                   className="w-full h-full object-contain p-6"
                   initial={{ opacity: 0, scale: 0.97 }}

@@ -17,7 +17,7 @@ const INITIAL_FORM = {
   badge: 'Pure Organic',
   tagline: 'Nature\'s gold, straight from our fields',
   description: '',
-  images: '/assets/Banana 1.png', // comma-separated strings or default path
+  images: 'assets/Banana 1.png', // comma-separated strings or default path
   tags: 'Natural, Pure, Organic',
   usage: 'Mix 1–2 teaspoons daily into warm water, milk, or smoothies.',
   category: 'superfood-powders',
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
       tagline: form.tagline.trim(),
       description: form.description.trim(),
       images: imagesArray,
-      heroImage: imagesArray[0] || '/assets/Placeholder.png',
+      heroImage: imagesArray[0] || 'assets/Logowoback.png',
       tags: tagsArray,
       usage: form.usage.trim(),
       category: form.category,
@@ -779,7 +779,7 @@ export default function AdminDashboard() {
                               {/* Small Thumbnail placeholder */}
                               <div className="w-12 h-12 bg-green-xlight border border-border-green rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
                                 <img
-                                  src={p.images && p.images[0] ? p.images[0] : '/assets/Placeholder.png'}
+                                  src={p.images && p.images[0] ? (p.images[0].startsWith('/') ? p.images[0].slice(1) : p.images[0]) : 'assets/Logowoback.png'}
                                   alt={p.name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {

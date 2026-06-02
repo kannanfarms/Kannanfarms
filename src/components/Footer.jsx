@@ -4,8 +4,8 @@ import { useInView } from '../hooks/useInView'
 
 const FOOTER_LINKS = [
   { label: 'Home',         to: '/'                     },
-  { label: 'Products',     href: '/#products'          },
-  { label: 'How It Works', href: '/#how'               },
+  { label: 'Products',     to: '/?scroll=products'     },
+  { label: 'How It Works', to: '/?scroll=how'          },
   { label: 'Cart',         to: '/cart'                 },
   { label: 'Banana Powder',to: '/product/banana-powder'},
   { label: 'Moringa Powder',to: '/product/moringa-powder'},
@@ -74,25 +74,15 @@ export default function Footer() {
               Quick Links
             </div>
             <div className="flex flex-col gap-3">
-              {FOOTER_LINKS.map((link) =>
-                link.to ? (
-                  <Link
-                    key={link.label}
-                    to={link.to}
-                    className="text-white/50 hover:text-green-vivid text-[13px] transition-colors duration-200 w-fit"
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="text-white/50 hover:text-green-vivid text-[13px] transition-colors duration-200 w-fit"
-                  >
-                    {link.label}
-                  </a>
-                )
-              )}
+              {FOOTER_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  className="text-white/50 hover:text-green-vivid text-[13px] transition-colors duration-200 w-fit"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
           </motion.div>
 

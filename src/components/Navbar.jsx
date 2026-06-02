@@ -6,9 +6,9 @@ import { useScrollY } from '../hooks/useScrollY'
 import { useAuth } from '../context/AuthContext'
 
 const NAV_LINKS = [
-  { label: 'Products',     href: '/#products' },
-  { label: 'How It Works', href: '/#how'      },
-  { label: 'Why Us',       href: '/#features' },
+  { label: 'Products',     targetId: 'products' },
+  { label: 'How It Works', targetId: 'how'      },
+  { label: 'Why Us',       targetId: 'features' },
 ]
 
 export default function Navbar() {
@@ -17,6 +17,17 @@ export default function Navbar() {
   const [cartCount, setCartCount] = useState(0)
   const location = useLocation()
   const { profile, isAuthenticated, signInWithGoogle, loading: authLoading, isAdmin } = useAuth()
+
+  const handleNavClick = (e, targetId) => {
+    setMenuOpen(false)
+    if (location.pathname === '/') {
+      e.preventDefault()
+      const el = document.getElementById(targetId)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }
 
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
   useEffect(() => {
@@ -53,7 +64,7 @@ export default function Navbar() {
           <Link to="/" className="flex items-center gap-3 group no-underline" aria-label="Kannan Farms Home">
             <div className="h-11 w-11 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center flex-shrink-0">
               <img
-                src="/assets/Logowoback.png"
+                src="assets/Logowoback.png"
                 alt="Kannan Farms"
                 className="h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-110"
                 onError={(e) => {
@@ -76,13 +87,14 @@ export default function Navbar() {
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
+                to={`/?scroll=${link.targetId}`}
+                onClick={(e) => handleNavClick(e, link.targetId)}
                 className="text-white/75 hover:text-white hover:bg-white/10 text-[13px] font-medium px-4 py-2 rounded-lg transition-all duration-200"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
 
             {isAdmin && (
@@ -205,17 +217,21 @@ export default function Navbar() {
               aria-label="Mobile navigation"
             >
               <div className="flex flex-col gap-1 flex-1">
-                {NAV_LINKS.map((link, i) => (
-                  <motion.a
+                 {NAV_LINKS.map((link, i) => (
+                  <motion.div
                     key={link.label}
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 * i, duration: 0.3 }}
-                    className="text-white/80 hover:text-white hover:bg-white/10 text-[16px] font-medium px-4 py-3.5 rounded-xl transition-all duration-200"
                   >
-                    {link.label}
-                  </motion.a>
+                    <Link
+                      to={`/?scroll=${link.targetId}`}
+                      onClick={(e) => handleNavClick(e, link.targetId)}
+                      className="text-white/80 hover:text-white hover:bg-white/10 text-[16px] font-medium px-4 py-3.5 rounded-xl transition-all duration-200 block no-underline"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
                 ))}
 
                 {isAdmin && (
