@@ -58,6 +58,7 @@ export function AuthProvider({ children }) {
     const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser)
       setProfile(parseProfile(firebaseUser))
+      setLoading(false)
 
       // Clean up previous listeners if user changes
       if (unsubscribeAdmin) {
@@ -164,6 +165,7 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     profile,
+    authLoading: loading, // Core auth state resolves instantly
     loading: loading || isAdminLoading || userPointsLoading, // Expose unified loading state
     isAdmin,
     isAdminLoading,

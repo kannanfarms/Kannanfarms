@@ -9,11 +9,11 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, authLoading } = useAuth()
   const location = useLocation()
 
   // While Firebase resolves the persisted session, show a spinner
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center gap-4">
         <motion.div

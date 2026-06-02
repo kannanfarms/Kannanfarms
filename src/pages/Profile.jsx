@@ -2,6 +2,7 @@
 // ─── Authenticated user profile + real-time order tracking ───────────────────
 
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import useOrders, { STATUS_COLORS, STATUS_ORDER } from '../hooks/useOrders'
@@ -215,15 +216,15 @@ function EmptyOrders() {
       <p className="text-text-muted text-sm max-w-xs mx-auto mb-6">
         Looks like you haven't placed an order with Kannan Farms yet. Explore our natural products!
       </p>
-      <a
-        href="/#products"
-        className="inline-flex items-center gap-2 bg-green-dark text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-green-main transition-colors duration-200"
+      <Link
+        to="/?scroll=products"
+        className="inline-flex items-center gap-2 bg-green-dark text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-green-main transition-colors duration-200 no-underline"
       >
         Shop Now
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-      </a>
+      </Link>
     </motion.div>
   )
 }
