@@ -1,5 +1,5 @@
 // src/App.jsx  — Stage 2: AuthProvider + ProtectedRoute wired in
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ProductProvider } from './context/ProductContext'
 import ScrollToTop from './components/ScrollToTop'
@@ -16,7 +16,7 @@ import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AuthProvider>
         <ProductProvider>
           <ScrollToTop />
@@ -64,6 +64,6 @@ export default function App() {
           </div>
         </ProductProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
