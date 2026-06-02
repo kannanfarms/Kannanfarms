@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import SEOHead from '../components/SEOHead'
 import Hero from '../components/Hero'
@@ -59,6 +59,7 @@ const TRUST = [
 export default function Home() {
   const { products, loading } = useProducts()
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -69,10 +70,12 @@ export default function Home() {
         if (el) {
           el.scrollIntoView({ behavior: 'smooth' })
         }
+        // Remove the ?scroll parameter from the URL to avoid scrolling on manual reload
+        navigate(location.pathname, { replace: true })
       }, 300)
       return () => clearTimeout(timer)
     }
-  }, [location])
+  }, [location, navigate])
 
   // Filter out products marked as hidden from consumers
   const visibleProducts = products.filter((p) => !p.hidden)

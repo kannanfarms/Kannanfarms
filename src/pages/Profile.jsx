@@ -382,7 +382,16 @@ export default function Profile() {
                 ) : ordersError ? (
                   <div className="text-center py-16 px-6">
                     <p className="text-red-500 text-sm mb-4">{ordersError}</p>
-                    <p className="text-text-muted text-xs">Please refresh the page or try again later.</p>
+                    <p className="text-text-muted text-xs mb-6">Please refresh the page or try again later.</p>
+                    <Link
+                      to="/?scroll=products"
+                      className="inline-flex items-center gap-2 bg-green-dark text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-green-main transition-colors duration-200 no-underline"
+                    >
+                      Shop Now
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
                   </div>
                 ) : orders.length === 0 ? (
                   <EmptyOrders />
