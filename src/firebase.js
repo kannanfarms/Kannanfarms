@@ -5,7 +5,11 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { initializeFirestore } from 'firebase/firestore'
+import { 
+  initializeFirestore, 
+  persistentLocalCache, 
+  persistentMultipleTabManager 
+} from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey:            import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB8ah-qkL9dO6D7J78jKn9wN2re4Ny6zzk",
@@ -33,6 +37,9 @@ googleProvider.setCustomParameters({
 
 // ── Firestore ─────────────────────────────────────────────────────────────────
 export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  }),
   experimentalForceLongPolling: true,
 })
 
