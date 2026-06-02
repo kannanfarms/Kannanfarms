@@ -52,6 +52,13 @@ export function AuthProvider({ children }) {
 
   // Subscribe to Firebase auth state changes
   useEffect(() => {
+    if (!auth) {
+      setLoading(false)
+      setIsAdminLoading(false)
+      setUserPointsLoading(false)
+      return
+    }
+
     let unsubscribeAdmin = null
     let unsubscribePoints = null
 

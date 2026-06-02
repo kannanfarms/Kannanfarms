@@ -18,6 +18,13 @@ export function ProductProvider({ children }) {
 
   // Listen to Firestore products collection in real-time
   useEffect(() => {
+    if (!db) {
+      console.warn('[ProductContext] Firestore db is not initialized. Using offline fallback catalog.')
+      setProducts(PRODUCTS)
+      setLoading(false)
+      return
+    }
+
     const productsRef = collection(db, 'products')
 
     const unsubscribe = onSnapshot(productsRef, async (snapshot) => {
