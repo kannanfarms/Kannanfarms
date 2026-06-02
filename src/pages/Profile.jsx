@@ -183,6 +183,36 @@ function OrderCard({ order }) {
                 </div>
               )}
 
+              {/* Pricing Breakdown */}
+              <div className="bg-green-xlight/30 rounded-xl p-4 text-xs space-y-2 border border-border-green/50">
+                <div className="flex justify-between text-text-muted">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-text-dark">
+                    ₹{(order.subtotal ?? (order.total - (order.shippingFee ?? 0) + (order.discount ?? 0))).toLocaleString('en-IN')}
+                  </span>
+                </div>
+                {order.discount > 0 && (
+                  <div className="flex justify-between text-amber-dark font-medium">
+                    <span>Points Discount</span>
+                    <span>−₹{order.discount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-text-muted">
+                  <span>Shipping</span>
+                  <span className="font-semibold text-text-dark">
+                    {order.shippingFee === 0 || order.shippingFee === undefined ? (
+                      <span className="text-green-main">FREE Delivery</span>
+                    ) : (
+                      `₹${order.shippingFee}`
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between font-bold text-text-dark border-t border-border-green/45 pt-2 mt-1">
+                  <span>Total Paid</span>
+                  <span className="text-green-dark">₹{order.total.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+
               {/* Delivery address */}
               {order.address && (
                 <div className="bg-amber-light/40 border border-amber/20 rounded-xl p-3">

@@ -24,6 +24,7 @@ export default function Cart() {
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
+  const [landmark, setLandmark] = useState('')
   const [pincode, setPincode] = useState('')
   
   // Delhivery API States
@@ -149,10 +150,86 @@ export default function Cart() {
     }
   }
 
+  // Calculate total cart weight in Kg
+  const parseWeightInKg = (weightStr) => {
+    const num = parseFloat(weightStr?.replace(/[a-zA-Z]/g, '') || '0')
+    if (weightStr?.toLowerCase().includes('kg')) return num
+    if (weightStr?.toLowerCase().includes('g')) return num / 1000
+    return 0.5
+  }
+
+  const totalWeight = items.reduce((sum, item) => {
+    const weight = parseWeightInKg(item.size?.weight)
+    return sum + weight * item.qty
+  }, 0)
+
+  const calculateDelhiveryShippingCharge = (destPin, weight) => {
+    if (!destPin || destPin.length !== 6 || !/^\d{6}$/.test(destPin)) {
+      return 0
+    }
+    const stepsOfHalfKg = Math.max(1, Math.ceil(weight / 0.5))
+    const pin = destPin.trim()
+    
+    let zone = 'D' // Default
+    if (pin.startsWith('641')) {
+      zone = 'A'
+    } else if (
+      pin.startsWith('19') ||
+      pin.startsWith('78') || pin.startsWith('79') ||
+      pin.startsWith('17') ||
+      pin.startsWith('744')
+    ) {
+      zone = 'E'
+    } else if (
+      pin.startsWith('600') || pin.startsWith('601') || pin.startsWith('602') || pin.startsWith('603') ||
+      pin.startsWith('560') || pin.startsWith('561') || pin.startsWith('562') ||
+      pin.startsWith('400') || pin.startsWith('401') || pin.startsWith('402') || pin.startsWith('403') || pin.startsWith('404') ||
+      pin.startsWith('110') || pin.startsWith('121') || pin.startsWith('122') ||
+      pin.startsWith('700') || pin.startsWith('701') || pin.startsWith('702') || pin.startsWith('703') ||
+      pin.startsWith('500') || pin.startsWith('501') || pin.startsWith('502') || pin.startsWith('503')
+    ) {
+      zone = 'C'
+    } else if (pin.startsWith('5') || pin.startsWith('6')) {
+      zone = 'B'
+    }
+
+    let baseRate = 95
+    let incrementalRate = 50
+    switch(zone) {
+      case 'A':
+        baseRate = 40
+        incrementalRate = 20
+        break
+      case 'B':
+        baseRate = 60
+        incrementalRate = 30
+        break
+      case 'C':
+        baseRate = 80
+        incrementalRate = 40
+        break
+      case 'D':
+        baseRate = 95
+        incrementalRate = 50
+        break
+      case 'E':
+        baseRate = 140
+        incrementalRate = 70
+        break
+    }
+    return baseRate + incrementalRate * (stepsOfHalfKg - 1)
+  }
+
+  const calculatedShipping = pincode.length === 6 && delhiveryEstimate && delhiveryEstimate.serviceable
+    ? calculateDelhiveryShippingCharge(pincode, totalWeight)
+    : 0
+
+  const shippingFee = (subtotal > 500 && calculatedShipping <= 100) ? 0 : calculatedShipping
+
   // Gamified Loyalty Points Calculations
   const pointsRedemptionVal = redeemPoints && isAuthenticated ? Math.min(userPoints, subtotal) : 0
-  const finalTotal = Math.max(0, subtotal - pointsRedemptionVal)
-  const estimatedEarnedPoints = Math.floor(finalTotal / 100) * 5
+  const finalTotal = Math.max(0, subtotal - pointsRedemptionVal) + shippingFee
+  const estimatedEarnedPoints = Math.floor(Math.max(0, subtotal - pointsRedemptionVal) / 100) * 5
 
   // Atomic Checkout Transaction
   const handlePlaceOrder = async (e) => {
@@ -189,7 +266,7 @@ export default function Cart() {
       orderId,
       timestamp: serverTimestamp(),
       status: 'Pending',
-      address: `${address.trim()}, Pincode: ${pincode.trim()}`,
+      address: `${address.trim()}${landmark.trim() ? `, Landmark: ${landmark.trim()}` : ''}, Pincode: ${pincode.trim()}`,
       pincode: pincode.trim(),
       phone: phone.trim(),
       fullName: fullName.trim(),
@@ -200,6 +277,7 @@ export default function Cart() {
       pointsEarned: estimatedEarnedPoints,
       estimatedDelivery: `Arriving in ${delhiveryEstimate.duration} via ${delhiveryEstimate.carrier}`,
       courier: 'Delhivery',
+      shippingFee,
       items: items.map((item) => ({
         name: `${item.name} (${item.size?.weight})`,
         qty: item.qty,
@@ -500,6 +578,18 @@ export default function Cart() {
                     />
                   </div>
 
+                  {/* Landmark */}
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider font-bold text-text-dark mb-1.5">Near Landmark (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Near Amman Temple, Opposite Govt School"
+                      value={landmark}
+                      onChange={(e) => setLandmark(e.target.value)}
+                      className="w-full bg-offwhite border-2 border-border-green p-3 text-[14px] rounded-xl focus:border-green-main focus:outline-none transition"
+                    />
+                  </div>
+
                   {/* Pincode with dynamic Delhivery timeline query */}
                   <div>
                     <label className="block text-[11px] uppercase tracking-wider font-bold text-text-dark mb-1.5">Destination Pincode</label>
@@ -619,9 +709,25 @@ export default function Cart() {
                     </div>
                   )}
 
-                  <div className="flex justify-between text-text-muted">
+                  <div className="flex justify-between text-text-muted text-[13px]">
                     <span>Shipping</span>
-                    <span className="text-green-main font-semibold">FREE Delivery</span>
+                    <span className="font-semibold text-text-dark">
+                      {shippingFee === 0 ? (
+                        <span className="flex items-center gap-1.5">
+                          {calculatedShipping > 0 && <span className="line-through text-text-muted text-[11px]">₹{calculatedShipping}</span>}
+                          <span className="text-green-main font-semibold">FREE Delivery</span>
+                        </span>
+                      ) : (
+                        <span className="flex flex-col items-end">
+                          <span>₹{shippingFee}</span>
+                          {subtotal > 500 && calculatedShipping > 100 && (
+                            <span className="text-[9px] text-amber-dark font-medium leading-none mt-0.5">
+                              (Shipping exceeds ₹100 threshold)
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </span>
                   </div>
                 </div>
 
