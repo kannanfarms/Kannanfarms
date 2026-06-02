@@ -26,35 +26,40 @@ export function ProductProvider({ children }) {
         list.push({ id: doc.id, ...doc.data() })
       })
 
-      // Auto-seeding: if Firestore is empty, populate it with existing catalog
+      const fromCache = snapshot.metadata.fromCache
+
+      // Auto-seeding: only if Firestore is empty on the server (not just empty local cache)
       if (list.length === 0) {
-        console.log('[ProductContext] Firestore empty. Bootstrapping seed products...')
-        try {
-          const batch = writeBatch(db)
-          
-          PRODUCTS.forEach((p) => {
-            const docRef = doc(db, 'products', p.id)
-            // Add a default stock level (e.g., 50) and hidden flag (false) to each size
-            const enhancedSizes = p.sizes.map((s) => ({
-              ...s,
-              stock: 50 // Default stock for all seeded products
-            }))
+        if (!fromCache) {
+          console.log('[ProductContext] Firestore empty on server. Bootstrapping seed products...')
+          try {
+            const batch = writeBatch(db)
+            
+            PRODUCTS.forEach((p) => {
+              const docRef = doc(db, 'products', p.id)
+              const enhancedSizes = p.sizes.map((s) => ({
+                ...s,
+                stock: 50
+              }))
 
-            const enhancedProduct = {
-              ...p,
-              sizes: enhancedSizes,
-              hidden: false,
-              createdAt: new Date().toISOString()
-            }
-            batch.set(docRef, enhancedProduct)
-          })
+              const enhancedProduct = {
+                ...p,
+                sizes: enhancedSizes,
+                hidden: false,
+                createdAt: new Date().toISOString()
+              }
+              batch.set(docRef, enhancedProduct)
+            })
 
-          await batch.commit()
-          console.log('[ProductContext] Auto-seeding completed successfully.')
-          setLoading(false)
-        } catch (err) {
-          console.error('[ProductContext] Error auto-seeding products:', err)
-          setLoading(false)
+            await batch.commit()
+            console.log('[ProductContext] Auto-seeding completed successfully.')
+            setLoading(false)
+          } catch (err) {
+            console.error('[ProductContext] Error auto-seeding products:', err)
+            setLoading(false)
+          }
+        } else {
+          console.log('[ProductContext] Local product cache is empty. Waiting for network response...')
         }
       } else {
         // Sort products by creation date or name to maintain stable ordering
