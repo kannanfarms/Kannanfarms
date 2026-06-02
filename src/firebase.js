@@ -13,13 +13,13 @@ import {
 } from 'firebase/firestore'
 
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB8ah-qkL9dO6D7J78jKn9wN2re4Ny6zzk",
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "kannan-farms.firebaseapp.com",
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID || "kannan-farms",
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "kannan-farms.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "1042900938920",
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID || "1:1042900938920:web:719094bdc71f7a08fbd29d",
-  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-75RW7BKBNS",
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 }
 
 // Guard: avoid re-initialising during HMR in development
