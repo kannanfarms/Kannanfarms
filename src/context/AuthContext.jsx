@@ -144,6 +144,7 @@ export function AuthProvider({ children }) {
           err.code !== 'auth/cancelled-popup-request') {
         setError(err.message)
         console.error('[AuthContext] Google sign-in error:', err)
+        alert(`Google Sign-In Error: ${err.message}\n\nHint: If you are hosting on GitHub Pages, please make sure you have added "bloomwishes.github.io" to the "Authorized Domains" list in your Firebase Console (Authentication > Settings > Authorized Domains).`)
       }
       return null
     }

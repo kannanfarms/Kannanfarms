@@ -98,19 +98,19 @@ export default function Hero() {
             variants={itemVariants}
             className="flex flex-wrap gap-4 justify-center"
           >
-            <a
-              href="#products"
-              className="btn-primary text-[15px]"
+            <button
+              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+              className="btn-primary text-[15px] cursor-pointer"
             >
               Shop Now
               <ArrowRight />
-            </a>
-            <a
-              href="#how"
-              className="btn-outline-white text-[15px]"
+            </button>
+            <button
+              onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })}
+              className="btn-outline-white text-[15px] cursor-pointer"
             >
               How It Works
-            </a>
+            </button>
           </motion.div>
 
           {/* Scroll indicator */}
