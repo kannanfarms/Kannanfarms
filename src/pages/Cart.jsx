@@ -12,6 +12,36 @@ import { useAuth } from '../context/AuthContext'
 import SEOHead from '../components/SEOHead'
 import Reveal from '../components/Reveal'
 
+const sendMerchantEmail = async (orderId, orderData) => {
+  try {
+    const emailData = {
+      _subject: `🌾 Kannan Farms - New Order #${orderId}`,
+      _captcha: 'false',
+      'Order ID': `#${orderId}`,
+      'Customer Name': orderData.fullName,
+      'Contact Phone': orderData.phone,
+      'Subtotal': `₹${orderData.subtotal.toLocaleString('en-IN')}`,
+      'Points Discount': orderData.discount > 0 ? `₹${orderData.discount.toLocaleString('en-IN')}` : 'None',
+      'Shipping Fee': orderData.shippingFee === 0 ? 'FREE' : `₹${orderData.shippingFee}`,
+      'Total Paid': `₹${orderData.total.toLocaleString('en-IN')}`,
+      'Shipping Address': orderData.address,
+      'Estimated Delivery': orderData.estimatedDelivery,
+      'Items Ordered': orderData.items.map(item => `${item.name} x ${item.qty} (₹${item.price})`).join('\n')
+    }
+
+    await fetch('https://formsubmit.co/ajax/kannansfarms@gmail.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(emailData)
+    })
+  } catch (err) {
+    console.error('[Merchant Notification Email Failed]:', err)
+  }
+}
+
 export default function Cart() {
   const { user, isAuthenticated, userPoints, signInWithGoogle, loading: authLoading } = useAuth()
   
@@ -310,6 +340,9 @@ export default function Cart() {
           updatedAt: new Date().toISOString()
         }, { merge: true })
       })
+
+      // Send automated email notification to merchant
+      sendMerchantEmail(orderId, orderData)
 
       // Format WhatsApp Message details
       const itemsListStr = items.map(item => `- ${item.name} (${item.size?.weight}) x ${item.qty} — ${item.size?.price}`).join('\n')
