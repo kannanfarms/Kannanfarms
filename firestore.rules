@@ -1,0 +1,94 @@
+// firestore.rules
+// ─── Kannan Farms Firestore Security Rules ───────────────────────────────────
+// Deploy with: firebase deploy --only firestore:rules
+//
+// Data model:
+//   /orders/{orderId}
+//       userId        : string   — must match auth.uid
+//       orderId       : string
+//       timestamp     : timestamp
+//       status        : "Pending" | "Processing" | "Shipped" |
+//                       "Out for Delivery" | "Delivered" | "Cancelled"
+//       trackingId    : string (optional)
+//       courier       : string (optional)
+//       total         : number
+//       items         : array of { name, qty, price }
+//       address       : string
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isValidStatus(status) {
+      return status in [
+        'Pending', 'Processing', 'Shipped',
+        'Out for Delivery', 'Delivered', 'Cancelled'
+      ];
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['userId', 'orderId', 'timestamp', 'status'])
+        && data.userId is string
+        && data.orderId is string
+        && data.status is string
+        && isValidStatus(data.status);
+    }
+
+    // ── Orders collection ───────────────────────────────────────────────────
+    match /orders/{orderId} {
+      // READ: order owner or authenticated admins can read
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
+
+      // CREATE: authenticated users can create orders for themselves
+      // (in production this would typically be a Cloud Function / server SDK)
+      allow create: if isAuthenticated()
+        && isOwner(request.resource.data.userId)
+        && isValidOrder(request.resource.data);
+
+      // UPDATE: owners can update non-critical fields, or authenticated admins can update status/courier/tracking
+      allow update: if isAuthenticated() && (
+        (isOwner(resource.data.userId) && isOwner(request.resource.data.userId) && isValidStatus(request.resource.data.status))
+        || exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+      );
+
+      // DELETE: not permitted from the client — use Cloud Functions
+      allow delete: if false;
+    }
+
+    // ── User profiles (optional extension) ─────────────────────────────────
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && (isOwner(userId) || exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
+    }
+
+    // ── Admins collection ───────────────────────────────────────────────────
+    match /admins/{email} {
+      // Authenticated users can read their own admin document to check access, or an admin can read all
+      allow read: if isAuthenticated() && (request.auth.token.email == email || exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
+      // Admins collection can only be modified by existing admins or via Admin SDK
+      allow write: if isAuthenticated() && exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    // ── Products collection ─────────────────────────────────────────────────
+    match /products/{productId} {
+      // Anyone can view products
+      allow read: if true;
+      // Only authenticated administrators can add, update, or remove products
+      allow write: if isAuthenticated() && exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    // ── Default: deny everything else ──────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
