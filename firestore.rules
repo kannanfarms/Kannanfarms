@@ -46,8 +46,8 @@ service cloud.firestore {
 
     // ── Orders collection ───────────────────────────────────────────────────
     match /orders/{orderId} {
-      // READ: only the order owner can read their own orders
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // READ: order owner or authenticated admins can read
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
 
       // CREATE: authenticated users can create orders for themselves
       // (in production this would typically be a Cloud Function / server SDK)
@@ -55,12 +55,11 @@ service cloud.firestore {
         && isOwner(request.resource.data.userId)
         && isValidOrder(request.resource.data);
 
-      // UPDATE: owners can update non-critical fields; status changes are
-      // typically done server-side. We allow limited client updates here.
-      allow update: if isAuthenticated()
-        && isOwner(resource.data.userId)
-        && isOwner(request.resource.data.userId)  // userId cannot change
-        && isValidStatus(request.resource.data.status);
+      // UPDATE: owners can update non-critical fields, or authenticated admins can update status/courier/tracking
+      allow update: if isAuthenticated() && (
+        (isOwner(resource.data.userId) && isOwner(request.resource.data.userId) && isValidStatus(request.resource.data.status))
+        || exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+      );
 
       // DELETE: not permitted from the client — use Cloud Functions
       allow delete: if false;

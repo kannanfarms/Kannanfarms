@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { collection, getDocs, writeBatch, doc } from 'firebase/firestore'
+import { collection, getDocs, writeBatch, doc, query, orderBy, onSnapshot, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useProducts } from '../context/ProductContext'
 import { useAuth } from '../context/AuthContext'
@@ -49,6 +49,60 @@ export default function AdminDashboard() {
   const [bonusPoints, setBonusPoints] = useState('')
   const [distributing, setDistributing] = useState(false)
   const [distResult, setDistResult] = useState('')
+
+  // Active Tab state: 'inventory' | 'orders'
+  const [activeTab, setActiveTab] = useState('inventory')
+  
+  // Orders management states
+  const [orders, setOrders] = useState([])
+  const [orderFilter, setOrderFilter] = useState('All')
+  const [updatingOrderId, setUpdatingOrderId] = useState(null)
+
+  // Fetch orders in real-time when activeTab is orders OR to show the alert badge on mount
+  useEffect(() => {
+    const ordersRef = collection(db, 'orders')
+    const q = query(ordersRef, orderBy('timestamp', 'desc'))
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const ordersList = []
+      snapshot.forEach((docSnap) => {
+        ordersList.push({ id: docSnap.id, ...docSnap.data() })
+      })
+      setOrders(ordersList)
+    }, (err) => {
+      console.error('[AdminDashboard] Fetch orders failed:', err)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const handleUpdateOrderStatus = async (orderDocId, newStatus) => {
+    setUpdatingOrderId(orderDocId)
+    try {
+      const orderRef = doc(db, 'orders', orderDocId)
+      await updateDoc(orderRef, {
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      })
+    } catch (err) {
+      console.error('[AdminDashboard] Failed to update order status:', err)
+      alert('Failed to update order status. Please try again.')
+    } finally {
+      setUpdatingOrderId(null)
+    }
+  }
+
+  const formatDate = (ts) => {
+    if (!ts) return 'N/A'
+    const date = ts.toDate ? ts.toDate() : new Date(ts)
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
   const handleDistributePoints = async (e) => {
     e.preventDefault()
@@ -420,8 +474,38 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* Main workspace grid */}
-          <div className="flex flex-col lg:flex-row gap-10">
+          {/* Tab Selector */}
+          <div className="flex gap-6 border-b border-border-green/60 pb-px mb-8 mt-4">
+            <button
+              onClick={() => setActiveTab('inventory')}
+              className={`font-dm font-bold text-sm pb-3 px-2 relative transition-all ${
+                activeTab === 'inventory'
+                  ? 'text-green-dark border-b-2 border-green-main'
+                  : 'text-text-muted hover:text-green-main'
+              }`}
+            >
+              📦 Inventory Management
+            </button>
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`font-dm font-bold text-sm pb-3 px-2 relative transition-all ${
+                activeTab === 'orders'
+                  ? 'text-green-dark border-b-2 border-green-main'
+                  : 'text-text-muted hover:text-green-main'
+              }`}
+            >
+              📋 Orders Management
+              {orders.filter(o => o.status === 'Pending').length > 0 && (
+                <span className="ml-2 bg-amber text-green-dark text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">
+                  {orders.filter(o => o.status === 'Pending').length} new
+                </span>
+              )}
+            </button>
+          </div>
+
+          {activeTab === 'inventory' ? (
+            /* Main workspace grid */
+            <div className="flex flex-col lg:flex-row gap-10">
 
             {/* Left side: CRUD Console Form */}
             <div className="lg:w-[48%] flex-shrink-0">
@@ -897,6 +981,170 @@ export default function AdminDashboard() {
             </div>
 
           </div>
+          ) : (
+            /* Orders Tab Content */
+            <div className="space-y-6">
+              {/* Filter controls */}
+              <div className="flex flex-wrap gap-2 bg-white border border-border-green rounded-2xl p-4 shadow-sm items-center justify-between">
+                <div className="flex flex-wrap gap-1.5">
+                  {['All', 'Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map((filterVal) => {
+                    const count = filterVal === 'All' ? orders.length : orders.filter(o => o.status === filterVal).length;
+                    return (
+                      <button
+                        key={filterVal}
+                        onClick={() => setOrderFilter(filterVal)}
+                        className={`font-dm font-bold text-xs px-3.5 py-2 rounded-lg border transition ${
+                          orderFilter === filterVal
+                            ? 'bg-green-main border-green-main text-white'
+                            : 'bg-offwhite border-border-green text-green-dark hover:bg-green-xlight'
+                        }`}
+                      >
+                        {filterVal} ({count})
+                      </button>
+                    )
+                  })}
+                </div>
+                <div className="text-xs text-text-muted font-medium">
+                  Showing {orders.filter(o => orderFilter === 'All' ? true : o.status === orderFilter).length} order{orders.filter(o => orderFilter === 'All' ? true : o.status === orderFilter).length !== 1 && 's'}
+                </div>
+              </div>
+
+              {/* Orders List */}
+              {orders.filter(o => orderFilter === 'All' ? true : o.status === orderFilter).length === 0 ? (
+                <div className="bg-white border border-border-green rounded-3xl p-14 text-center shadow-sm">
+                  <div className="text-5xl mb-4">📋</div>
+                  <h3 className="font-playfair font-bold text-lg text-text-dark mb-1">No Orders Found</h3>
+                  <p className="text-text-muted text-xs">
+                    {orderFilter === 'All' ? 'No orders have been received yet on this store.' : `No orders with status "${orderFilter}" were found.`}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {orders.filter(o => orderFilter === 'All' ? true : o.status === orderFilter).map((order) => {
+                    const statusColors = {
+                      'Pending': 'bg-amber-light text-amber-dark border-amber/30',
+                      'Processing': 'bg-blue-50 text-blue-600 border-blue-200',
+                      'Shipped': 'bg-cyan-50 text-cyan-600 border-cyan-200',
+                      'Out for Delivery': 'bg-purple-50 text-purple-600 border-purple-200',
+                      'Delivered': 'bg-green-light text-green-dark border-green-main/30',
+                      'Cancelled': 'bg-red-50 text-red-600 border-red-200'
+                    };
+
+                    return (
+                      <div
+                        key={order.id}
+                        className="bg-white border border-border-green rounded-3xl p-6 md:p-8 shadow-card flex flex-col gap-6 relative overflow-hidden text-left"
+                      >
+                        {/* Status bar top */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border-green/40 pb-5">
+                          <div>
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono font-bold text-green-dark text-[15px] sm:text-[16px] tracking-wide">
+                                {order.orderId || order.id.slice(0, 10)}
+                              </span>
+                              <span className={`text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${statusColors[order.status] || 'bg-gray-100 text-gray-700'}`}>
+                                {order.status}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-text-muted mt-1">
+                              Ordered on {formatDate(order.timestamp)}
+                            </p>
+                          </div>
+
+                          {/* Status changer dropdown */}
+                          <div className="flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-text-dark uppercase tracking-wider">Change Status:</label>
+                            <div className="relative flex items-center">
+                              <select
+                                value={order.status}
+                                disabled={updatingOrderId === order.id}
+                                onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                                className="bg-offwhite border border-border-green rounded-xl py-1.5 px-3 text-xs font-semibold focus:outline-none focus:border-green-main disabled:opacity-50"
+                              >
+                                {['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map((statusOption) => (
+                                  <option key={statusOption} value={statusOption}>
+                                    {statusOption}
+                                  </option>
+                                ))}
+                              </select>
+                              {updatingOrderId === order.id && (
+                                <div className="w-3.5 h-3.5 border-2 border-green-light border-t-green-main rounded-full animate-spin ml-2" />
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Customer & Shipping grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-[13px] border-b border-border-green/40 pb-5">
+                          {/* Recipient info */}
+                          <div>
+                            <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Customer Info</h4>
+                            <p className="font-bold text-text-dark">{order.fullName || 'N/A'}</p>
+                            <p className="text-text-muted font-medium mt-1">
+                              📞 <a href={`tel:${order.phone}`} className="hover:underline">{order.phone || 'N/A'}</a>
+                            </p>
+                          </div>
+
+                          {/* Shipping address */}
+                          <div className="md:col-span-2">
+                            <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Shipping Details</h4>
+                            <p className="text-text-dark font-medium leading-relaxed">
+                              📍 {order.address || 'N/A'}
+                            </p>
+                            <p className="text-[11px] text-text-muted mt-1.5 italic bg-offwhite border border-border-green/30 px-2 py-1 rounded w-fit">
+                              Timeline: {order.estimatedDelivery || 'N/A'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Items summary and Financials breakdown row */}
+                        <div className="flex flex-col md:flex-row justify-between gap-6 items-start">
+                          {/* Items table */}
+                          <div className="flex-1 w-full space-y-2">
+                            <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2.5">Items Ordered</h4>
+                            {order.items && order.items.map((item, index) => (
+                              <div key={index} className="flex justify-between items-center text-xs bg-offwhite/50 border border-border-green/20 rounded-xl p-2 px-3">
+                                <span className="font-medium text-text-dark">{item.name || item.title}</span>
+                                <span className="font-semibold text-text-dark">
+                                  {item.qty} × ₹{item.price}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Financials details card */}
+                          <div className="w-full md:w-[260px] bg-green-xlight/30 border border-border-green rounded-2xl p-4 text-xs space-y-2.5">
+                            <h4 className="text-[10px] font-bold text-green-dark uppercase tracking-wider mb-2">Billing Details</h4>
+                            <div className="flex justify-between text-text-muted">
+                              <span>Subtotal</span>
+                              <span className="font-semibold text-text-dark">₹{order.subtotal?.toLocaleString('en-IN') || 0}</span>
+                            </div>
+                            {order.discount > 0 && (
+                              <div className="flex justify-between text-amber-dark font-semibold">
+                                <span>Points Discount</span>
+                                <span>−₹{order.discount?.toLocaleString('en-IN') || 0}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between text-text-muted">
+                              <span>Shipping</span>
+                              <span className="font-semibold text-text-dark">
+                                {order.shippingFee === 0 ? <span className="text-green-main font-bold">FREE</span> : `₹${order.shippingFee}`}
+                              </span>
+                            </div>
+                            <div className="border-t border-border-green/60 pt-2 flex justify-between font-bold text-sm text-text-dark">
+                              <span>Total Paid</span>
+                              <span className="text-green-main">₹{order.total?.toLocaleString('en-IN') || 0}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>
