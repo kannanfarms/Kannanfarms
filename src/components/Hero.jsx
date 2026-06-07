@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import FloatingJars from './FloatingJars'
 
 const containerVariants = {
   hidden: {},
@@ -43,7 +44,7 @@ export default function Hero() {
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
           <motion.div
-            className="max-w-3xl mx-auto text-center"
+            className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -67,7 +68,7 @@ export default function Hero() {
             <motion.h1
               variants={itemVariants}
               className="font-playfair font-black text-white leading-[1.06] mb-5"
-              style={{ fontSize: 'clamp(42px, 5.5vw, 80px)' }}
+              style={{ fontSize: 'clamp(42px, 5.5vw, 68px)' }}
             >
               From Our Farm
               <br />
@@ -80,7 +81,7 @@ export default function Hero() {
             {/* Subtext */}
             <motion.p
               variants={itemVariants}
-              className="text-[17px] leading-relaxed font-light max-w-[520px] mx-auto lg:mx-0 mb-10"
+              className="text-[17px] leading-relaxed font-light max-w-[520px] mb-10"
               style={{ color: 'rgba(255,255,255,0.68)' }}
             >
               Premium natural powders from the finest farms — pure, potent, and packed with nature's best nutrition.
@@ -89,7 +90,7 @@ export default function Hero() {
             {/* CTA buttons */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-4 justify-center"
+              className="flex flex-wrap gap-4 justify-center lg:justify-start"
             >
               <button
                 onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
@@ -103,7 +104,7 @@ export default function Hero() {
             {/* Trust micro-strip */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-5 mt-10 justify-center"
+              className="flex flex-wrap gap-5 mt-10 justify-center lg:justify-start"
             >
               {[
                 { icon: <ShieldIcon />, label: 'FSSAI Certified' },
@@ -116,6 +117,16 @@ export default function Hero() {
                 </div>
               ))}
             </motion.div>
+          </motion.div>
+
+          {/* Interactive Mockup right side */}
+          <motion.div 
+            className="w-full lg:w-1/2 flex justify-center lg:justify-end"
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <FloatingJars />
           </motion.div>
 
 
