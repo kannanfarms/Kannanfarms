@@ -7,20 +7,16 @@ export default function ProductCard({ product, index = 0 }) {
   const [hovered, setHovered] = useState(false)
   const [imgLoaded, setImgLoaded] = useState(false)
 
-  // Raw motion values for mouse position
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  // Spring-smooth the raw values
   const springConfig = { stiffness: 200, damping: 25, mass: 0.8 }
   const smoothX = useSpring(mouseX, springConfig)
   const smoothY = useSpring(mouseY, springConfig)
 
-  // Map smoothed values to rotation
   const rotateX = useTransform(smoothY, [-0.5, 0.5], ['8deg', '-8deg'])
   const rotateY = useTransform(smoothX, [-0.5, 0.5], ['-8deg', '8deg'])
 
-  // Subtle glare overlay position
   const glareX = useTransform(smoothX, [-0.5, 0.5], ['0%', '100%'])
   const glareY = useTransform(smoothY, [-0.5, 0.5], ['0%', '100%'])
 
@@ -44,6 +40,7 @@ export default function ProductCard({ product, index = 0 }) {
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.7, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
       style={{ perspective: '1000px' }}
+      className="w-full max-w-[360px]"
     >
       <Link to={`/product/${product.slug}`} className="no-underline block">
         <motion.article
@@ -56,7 +53,7 @@ export default function ProductCard({ product, index = 0 }) {
             rotateY,
             transformStyle: 'preserve-3d',
           }}
-          className="relative w-[340px] max-w-full bg-white border-2 border-border-green rounded-3xl overflow-hidden cursor-pointer select-none"
+          className="relative w-full bg-white border-2 border-border-green rounded-3xl overflow-hidden cursor-pointer select-none"
           whileHover={{ borderColor: 'rgba(27,138,76,0.8)' }}
           transition={{ duration: 0.3 }}
           aria-label={`View ${product.name}`}
@@ -71,7 +68,7 @@ export default function ProductCard({ product, index = 0 }) {
           transition={{ duration: 0.2 }}
         />
 
-        {/* Drop shadow elevation on hover */}
+        {/* Drop shadow on hover */}
         <motion.div
           className="absolute -inset-px rounded-3xl pointer-events-none z-0"
           style={{
@@ -84,7 +81,6 @@ export default function ProductCard({ product, index = 0 }) {
 
         {/* Image area */}
         <div className="relative h-[260px] bg-green-xlight overflow-hidden">
-          {/* Skeleton shimmer while loading */}
           {!imgLoaded && (
             <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-green-xlight via-green-light to-green-xlight" />
           )}
@@ -97,7 +93,7 @@ export default function ProductCard({ product, index = 0 }) {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             onLoad={() => setImgLoaded(true)}
             onError={(e) => {
-              e.target.src = `https://placehold.co/340x260/EDFAF3/1B8A4C?text=${encodeURIComponent(product.name)}`
+              e.target.src = `https://placehold.co/360x260/EDFAF3/1B8A4C?text=${encodeURIComponent(product.name)}`
               setImgLoaded(true)
             }}
           />
@@ -107,7 +103,6 @@ export default function ProductCard({ product, index = 0 }) {
             {product.badge}
           </div>
 
-          {/* Gradient overlay at bottom of image */}
           <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white/20 to-transparent" />
         </div>
 
@@ -140,10 +135,8 @@ export default function ProductCard({ product, index = 0 }) {
                 {product.sizes?.[0]?.price || '₹ View Price'}
               </div>
             </div>
-            <span
-              className="btn-primary text-[13px] px-5 py-3 no-underline inline-block"
-            >
-              Buy Now →
+            <span className="btn-primary text-[13px] px-5 py-3 no-underline inline-block">
+              View Product →
             </span>
           </div>
         </div>

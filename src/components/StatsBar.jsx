@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useInView } from '../hooks/useInView'
 
 const STATS = [
-  { id: 'c1', target: 500,  suffix: '+',  label: 'Happy Customers' },
-  { id: 'c2', target: 2,    suffix: '+',  label: 'Products'         },
+  { id: 'c1', target: 500,  suffix: '+',  label: 'Happy Customers'   },
+  { id: 'c2', target: 1200, suffix: '+',  label: 'Orders Delivered'  },
   { id: 'c3', target: null, suffix: '+',  label: 'Years of Purity', dynamic: () => new Date().getFullYear() - 2023 || 1 },
-  { id: 'c4', target: 100,  suffix: '%',  label: 'Natural'          },
+  { id: 'c4', target: 100,  suffix: '%',  label: 'Natural'           },
 ]
 
 function Counter({ target, suffix }) {
-  const [value, setValue] = useState(0)
+  const [value, setValue]   = useState(0)
   const [started, setStarted] = useState(false)
   const [ref, inView] = useInView({ threshold: 0.4 })
 
@@ -21,7 +21,6 @@ function Counter({ target, suffix }) {
       const tick = (now) => {
         const elapsed = now - startTime
         const progress = Math.min(elapsed / duration, 1)
-        // Ease out cubic
         const eased = 1 - Math.pow(1 - progress, 3)
         setValue(Math.floor(eased * target))
         if (progress < 1) requestAnimationFrame(tick)
@@ -31,11 +30,7 @@ function Counter({ target, suffix }) {
     }
   }, [inView, started, target])
 
-  return (
-    <span ref={ref}>
-      {value}{suffix}
-    </span>
-  )
+  return <span ref={ref}>{value}{suffix}</span>
 }
 
 export default function StatsBar() {
