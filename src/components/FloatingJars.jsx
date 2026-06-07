@@ -30,7 +30,7 @@ export default function FloatingJars() {
   }, [mouseX, mouseY])
 
   return (
-    <div className="relative w-full max-w-[500px] h-[360px] md:h-[420px] flex items-center justify-center select-none perspective-1000 mt-6 lg:mt-0">
+    <div className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[500px] h-[260px] sm:h-[320px] lg:h-[420px] flex items-center justify-center select-none perspective-1000 mt-4 lg:mt-0">
       {/* Floating and tilting container for the high-fidelity mockup image */}
       <motion.div
         className="w-full h-full flex items-center justify-center"

@@ -87,6 +87,14 @@ export default function Hero() {
               Premium natural powders from the finest farms — pure, potent, and packed with nature's best nutrition.
             </motion.p>
 
+            {/* Mobile-only Mockup (shown only on mobile between subtext and CTA) */}
+            <motion.div 
+              className="lg:hidden w-full flex justify-center my-6"
+              variants={itemVariants}
+            >
+              <FloatingJars />
+            </motion.div>
+
             {/* CTA buttons */}
             <motion.div
               variants={itemVariants}
@@ -121,7 +129,7 @@ export default function Hero() {
 
           {/* Interactive Mockup right side */}
           <motion.div 
-            className="w-full lg:w-1/2 flex justify-center lg:justify-end"
+            className="hidden lg:flex w-full lg:w-1/2 justify-center lg:justify-end"
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
